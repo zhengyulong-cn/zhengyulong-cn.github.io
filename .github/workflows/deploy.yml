@@ -46,17 +46,6 @@ jobs:
       - name: 构建Docusaurus项目 🚀
         run: npm run build
       
-      # - name: 跨仓库部署代码 🚀
-      #   uses: crazy-max/ghaction-github-pages@v3
-      #   with: 
-      #     # repo: JonnyLong-cn/long-essays
-      #     repo: zhengyulong-cn/zhengyulong-cn.github.io
-      #     target_branch: master
-      #     # 部署目录
-      #     build_dir: build
-      #     commit_message: 自动化部署构建的Docusaurus页面 🚀🚀🚀🚀🚀🚀🚀🚀
-      #   env:
-      #     GH_PAT: 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
       - name: 代码部署 🚀
         uses: peaceiris/actions-gh-pages@v3
         with:

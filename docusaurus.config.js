@@ -2,7 +2,7 @@ const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: '筝语的小站',
+  title: '筝语的博客',
   tagline: '纸上得来终觉浅，绝知此事要躬行',
   favicon: 'img/logo.svg',
   url: 'https://zhengyulong-cn.github.io',
@@ -36,7 +36,7 @@ const config = {
     ({
       image: 'img/docusaurus-social-card.jpg',
       navbar: {
-        title: '筝语的小站',
+        title: '筝语的博客',
         logo: {
           alt: '我的网站Logo',
           src: 'img/logo.svg',

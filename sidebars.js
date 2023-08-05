@@ -79,8 +79,10 @@ const sidebars = {
       label: 'Webpack5从入门到精通',
       type: 'category',
       items: [
-        'programing-skills/Webpack5从入门到精通/Webpack5基础使用篇/index',
-        'programing-skills/Webpack5从入门到精通/Webpack5环境配置篇/index',
+        'programing-skills/Webpack5从入门到精通/Webpack5常用配置/index',
+        'programing-skills/Webpack5从入门到精通/Webpack5官网文档学习笔记/index',
+        'programing-skills/Webpack5从入门到精通/Webpack5环境配置/index',
+        'programing-skills/Webpack5从入门到精通/Webpack5高级应用/index',
       ]
     },
     {
