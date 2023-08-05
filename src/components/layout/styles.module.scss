@@ -1,0 +1,24 @@
+.layoutBox {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+  .leftBar {
+    width: 15rem;
+    border-right: 2px solid black;
+    padding: 1rem;
+    .sidebarItem {
+      font-family: 'Kaiti';
+      cursor: pointer;
+      padding: .25rem .5rem;
+      &:hover {
+        color: purple;
+        background-color: antiquewhite;
+        border-radius: 0.25rem;
+      }
+    }
+  }
+  .rightBody {
+    flex: 1;
+    padding: 1rem;
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "justifyContent": [
+    "start",
+    "center",
+    "end",
+    "stretch",
+    "space-around",
+    "space-between",
+    "space-evenly"
+  ],
+  "alignContent": [
+    "start",
+    "center",
+    "end",
+    "stretch",
+    "space-around",
+    "space-between",
+    "space-evenly"
+  ],
+  "justifyItems": [
+    "start",
+    "center",
+    "end",
+    "stretch"
+  ],
+  "alignItems": [
+    "start",
+    "center",
+    "end",
+    "stretch"
+  ],
+  "gridAutoFlow": [
+    "row",
+    "column",
+    "row dense",
+    "column dense"
+  ]
+}
