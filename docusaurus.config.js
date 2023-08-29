@@ -44,9 +44,15 @@ const config = {
         items: [
           {
             type: 'docSidebar',
-            sidebarId: 'programing-skills',
+            sidebarId: 'frontend-programing-skills',
             position: 'left',
-            label: '专业技术',
+            label: '前端技术',
+          },
+          {
+            type: 'docSidebar',
+            sidebarId: 'backend-programing-skills',
+            position: 'left',
+            label: '后端技术',
           },
           {
             type: 'docSidebar',
