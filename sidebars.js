@@ -99,12 +99,19 @@ const sidebars = {
   'backend-programing-skills': [
     'backend-programing-skills/index',
     {
+      label: 'Go语言从入门到精通',
+      type: 'category',
+      items: [
+        'backend-programing-skills/Go语言从入门到精通/Go语言基础'
+      ]
+    },
+    {
       label: '操作系统',
       type: 'category',
       items: [
         'backend-programing-skills/操作系统/操作系统理论/index'
       ]
-    }
+    },
   ],
   'interview': [
     {
