@@ -503,9 +503,7 @@ func main()  {
 }
 ```
 
-### 复合数据类型
-
-#### 数组
+### 数组
 
 定义数组：
 
@@ -563,11 +561,285 @@ func zero(ptr *[32]byte) {
 }
 ```
 
-#### Slice（切片） 
+### Slice（切片） 
 
-Slice 代表变长的序列，序列中每个元素都有相同的类型，一般写作 `[]T`，其中 `T` 代表 Slice 中元素类型。
+#### 构成
 
-Slice 由三部分组成：指针、长度、容量。指针指向第一个 Slice 元素对应的底层数组元素的地址，长度对应 Slice中元素数目，容量是从 Slice 开始位置到结尾位置，长度不能超过容量。
+`Slice` 由三部分组成：
 
-可以通过 `len()` 获取 Slice 长度，通过 `cap()` 获取 Slice 容量。
+- 指针：指向第一个 `Slice` 元素对应的底层数组元素的地址
+- 长度：`Slice` 中元素的数目，可以通过 `len()` 获取
+- 容量：从 `Slice` 的开始位置到结束位置，可以通过 `cap()` 获取
+
+定义切片：
+
+```Go
+var s []int
+// 定义长度为len，容量为cap的切片
+var s = make([]int, len, cap)
+```
+
+多个 `Slice` 之间可以共享底层的数据，并且引用的数组部分区间可能重叠。
+
+![两个Slice引用](./images/两个Slice引用.png)
+
+```Go
+func main() {
+    months := [...]string{"", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
+    Q2 := months[4:13]
+    summer := months[6:9]
+    fmt.Println(Q2, len(Q2), cap(Q2))  // ["April", "May", "June"] 3 9
+    fmt.Println(summer, len(summer), cap(summer))  // ["June", "July", "August"] 3 7
+    endlessSummer := summer[1:3]
+    fmt.Println(endlessSummer, len(endlessSummer), cap(endlessSummer))  // ["July", "August"] 2 6
+}
+```
+
+切片操作不能超出 `cap(s)` ，但能超出 `len(s)` 。上面代码中 summer 是针对 months `[6:9]` 的切片，此时summer 的 `len()` 为 3，但 `cap()` 为 7；endlessSummer 是针对 summer  `[1:3]` 的切片，因此切片最大为 7，起始坐标就是 summer 的起始坐标。
+
+切片后的数据底层都是共享之前的底层数组，因此这种操作都是常量时间复杂度。
+
+`Slice` 是不支持比较运算符，有两个原因：
+
+1. `Slice` 元素是间接引用的，甚至可以引用自身
+2. 固定的 `Slice` 在不同时刻可能会有不同的元素，因为底层数组的元素可能会被修改
+
+因此安全的做法是直接禁止 `Slice` 之间的比较操作，只允许它和 `nil` 比较。
+
+```Go
+if summer == nil { /* ... */ }
+```
+
+看下面代码：
+
+```Go
+var s []int
+s = nil
+s = []int(nil)
+s = []int{}
+```
+
+问题一：为啥的是定义切片，而不是数组？
+
+因为在语法定义中 `[]int` 表示的是一个整形的切片类型，如果要声明数组，应该指定固定长度，如 `var s [10]int`。
+
+问题二：后三行有啥区别？
+
+- `s = nil` 表示将切片设置为 `nil`，表示是空的切片，这个切片没有引用任何底层数组，长度和容量都是 0。
+- `s = []int(nil)` 同样表示将切片设置为 `nil`，只是这里使用了类型转换来明确指出切片类型是 `[]int`，实际效果和 `s = nil` 相同。
+- `s = []int{}` 表示初始为没有元素的切片，实际是引用了底层数组的，但数组为空，所以长度和容量都是 0。
+
+**因此判断切片是否为空，不能通过比较 `nil` 来判断，可以通过 `len(s)==0` 来判断。除了和 `nil` 相等比较外，一个 `nil` 值的 `Slice` 的行为和其它任意0长度的 `Slice` 一样，`reverse(nil)` 是安全的。**
+
+#### 常用函数
+
+##### append
+
+append函数用于向 `Slice` 追加元素，该函数会自动扩容，扩容为原先容量的 2 倍，即 `cap(slice) * 2`。
+
+```Go
+func main() {
+    // 定义数组
+    var numbers [4]int = [4]int{1,2,3,4}
+    fmt.Println(numbers)
+    // 定义针对数组的切片
+    var slice []int = numbers[:]
+    fmt.Println(slice, len(slice), cap(slice))
+    slice = append(slice, 5)
+    // 放入新元素后发现切片容量变为了8
+    fmt.Println(slice, len(slice), cap(slice))
+}
+
+/*
+[1 2 3 4]
+[1 2 3 4] 4 4
+[1 2 3 4 5] 5 8
+*/
+```
+
+![Slice容量变化](./images/Slice容量变化.png)
+
+##### copy
+
+copy 函数用于拷贝切片内容。注意只拷贝切片内容，如果被拷贝切片容量小于要拷贝的，多余内容就舍弃掉。
+
+```Go
+func main() {
+    // 定义数组
+    var numbers [4]int = [4]int{1,2,3,4}
+    var slice []int = numbers[:]
+    fmt.Println(slice, len(slice), cap(slice))
+    var slice2 []int = make([]int, 2, 2)
+    copy(slice2, slice)
+    fmt.Println(slice2, len(slice2), cap(slice2))
+}
+
+/*
+[1 2 3 4] 4 4
+[1 2] 2 2
+*/
+```
+
+### Map
+
+定义Map：
+
+```Go
+// 使用字面量创建Map
+var myMap map[string]int = map[string]int{
+    "apple": 1,
+    "banana": 2,
+    "orange": 3,
+}
+// 创建初始容量为10的map
+var myMap map[string]int = make(map[string]int, 10)
+```
+
+基本操作：
+
+```Go
+// 添加或修改元素
+myMap["apple"] = 5
+myMap["grape"] = 100
+// 获取元素，获取不到则为零值, false
+var val, ok = myMap["apple"]
+// 获取Map长度
+var len = len(myMap)
+// 删除元素
+delete(myMap, "orange")
+// 迭代遍历Map
+for k, v := range myMap {
+    fmt.Printf("key=%s, value=%d\n", k, v)
+}
+```
+
+Map 的迭代顺序是不确定的，这是故意设计的，因此如果想按照 key 显式排序，那么需要按照如下处理：
+
+```Go
+func main() {
+    var myMap map[string]int = map[string]int{
+        "apple": 1,
+        "banana": 2,
+        "orange": 3,
+    }
+    var keys []string = make([]string, 0, len(myMap))
+    for k := range myMap {
+        keys = append(keys, k)
+    }
+    sort.Strings(keys)
+    for _, k := range keys {
+        fmt.Println(k, myMap[k])
+    }
+}
+```
+
+Go 没有提供集合类型，但 Map 的 key 是唯一的，可以间接实现。
+
+```Go
+type Set map[string]bool
+func main() {
+    mySet := make(Set)
+    // 添加集合元素
+    mySet["Alice"] = true
+    fmt.Println(mySet)
+}
+```
+
+### 结构体
+
+```Go
+type Student struct {
+    Name    string
+    Age     int
+    Class   string
+}
+func main() {
+    // 定义结构体
+    student1 := Student{ Name: "Bob", Age: 17, Class: "Class B" }
+    // 通过.运算符访问结构体成员
+    fmt.Println("Student 1: ", student1.Name, student1.Age, student1.Class)
+}
+```
+
+### 指针
+
+#### 定义
+
+和 C 语言中类似。
+
+nil：空指针，指代零值。
+
+:::danger
+
+注意：定义指针不能使用 `:=` 方式，必须通过 `var` 定义并指定好类型。
+
+:::
+
+```Go
+func main() {
+    a := 10
+    var p *int = &a
+    fmt.Println(*p)  // 10
+}
+```
+
+#### 数组的指针
+
+对于二维数组，注意对不同层的指针：
+
+```Go
+func main() {
+    arr := [2][3]int{
+        {1,2,3},
+        {4,5,6},
+    }
+    var p1 *[2][3]int = &arr
+    var p2 *[3]int = &arr[1]
+    var p3 *int = &arr[1][1]
+    fmt.Println(*p1)
+    fmt.Println(*p2)
+    fmt.Println(*p3)
+}
+
+/*
+[[1 2 3] [4 5 6]]
+[4 5 6]
+5
+*/
+```
+
+#### 指向指针的指针
+
+```Go
+func main() {
+    a := 3000
+    var ptr *int = &a
+    var pptr **int = &ptr
+    fmt.Printf("变量 a = %d\n", a )
+    fmt.Printf("指针变量 *ptr = %d\n", *ptr )
+    fmt.Printf("指向指针的指针变量 **pptr = %d\n", **pptr)
+}
+```
+
+#### 结构体的指针
+
+定义的指针变量可以存储结构体变量的地址。
+
+```Go
+type Student struct {
+    name    string
+    age     int
+    class   string
+}
+
+func main() {
+    student := Student{
+        name: "Alice",
+        age: 20,
+        class: "2班",
+    }
+    var p *Student = &student
+    fmt.Println(p.name, (*p).name)  // Alice Alice
+}
+```
 
