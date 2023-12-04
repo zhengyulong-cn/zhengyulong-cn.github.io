@@ -1,3 +1,13 @@
+# Go语言基础
+
+> 未完成：
+> - [ ] 方法部分，差New()、组合
+> - [ ] 代码组织管理部分，未全
+> - [ ] 接口
+> - [ ] 反射
+> - [ ] 泛型
+> - [ ] 文件操作
+
 ## 一、安装
 
 ### Linux
@@ -573,7 +583,7 @@ func zero(ptr *[32]byte) {
 
 定义切片：
 
-```Go
+```go
 var s []int
 // 定义长度为len，容量为cap的切片
 var s = make([]int, len, cap)
@@ -583,7 +593,7 @@ var s = make([]int, len, cap)
 
 ![两个Slice引用](./images/两个Slice引用.png)
 
-```Go
+```go
 func main() {
     months := [...]string{"", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
     Q2 := months[4:13]
@@ -606,13 +616,13 @@ func main() {
 
 因此安全的做法是直接禁止 `Slice` 之间的比较操作，只允许它和 `nil` 比较。
 
-```Go
+```go
 if summer == nil { /* ... */ }
 ```
 
 看下面代码：
 
-```Go
+```go
 var s []int
 s = nil
 s = []int(nil)
@@ -633,11 +643,11 @@ s = []int{}
 
 #### 常用函数
 
-##### append
+##### append()
 
 append函数用于向 `Slice` 追加元素，该函数会自动扩容，扩容为原先容量的 2 倍，即 `cap(slice) * 2`。
 
-```Go
+```go
 func main() {
     // 定义数组
     var numbers [4]int = [4]int{1,2,3,4}
@@ -659,11 +669,11 @@ func main() {
 
 ![Slice容量变化](./images/Slice容量变化.png)
 
-##### copy
+##### copy()
 
 copy 函数用于拷贝切片内容。注意只拷贝切片内容，如果被拷贝切片容量小于要拷贝的，多余内容就舍弃掉。
 
-```Go
+```go
 func main() {
     // 定义数组
     var numbers [4]int = [4]int{1,2,3,4}
@@ -684,7 +694,7 @@ func main() {
 
 定义Map：
 
-```Go
+```go
 // 使用字面量创建Map
 var myMap map[string]int = map[string]int{
     "apple": 1,
@@ -697,7 +707,7 @@ var myMap map[string]int = make(map[string]int, 10)
 
 基本操作：
 
-```Go
+```go
 // 添加或修改元素
 myMap["apple"] = 5
 myMap["grape"] = 100
@@ -715,7 +725,7 @@ for k, v := range myMap {
 
 Map 的迭代顺序是不确定的，这是故意设计的，因此如果想按照 key 显式排序，那么需要按照如下处理：
 
-```Go
+```go
 func main() {
     var myMap map[string]int = map[string]int{
         "apple": 1,
@@ -735,7 +745,7 @@ func main() {
 
 Go 没有提供集合类型，但 Map 的 key 是唯一的，可以间接实现。
 
-```Go
+```go
 type Set map[string]bool
 func main() {
     mySet := make(Set)
@@ -747,17 +757,68 @@ func main() {
 
 ### 结构体
 
-```Go
+#### 结构体基本使用
+
+包括：
+
+- 结构体定义
+- 结构体属性访问
+- 结构体中是否含匿名字段
+- 结构体中使用结构体
+
+```go
+// 定义结构体
+type Person struct {
+    name string
+    age int
+}
+type Address struct {
+    city, area string
+}
 type Student struct {
-    Name    string
-    Age     int
-    Class   string
+    // 结构体中的匿名字段
+    Person
+    speciality string
+    // 结构体嵌套
+    address Address
 }
 func main() {
-    // 定义结构体
-    student1 := Student{ Name: "Bob", Age: 17, Class: "Class B" }
-    // 通过.运算符访问结构体成员
-    fmt.Println("Student 1: ", student1.Name, student1.Age, student1.Class)
+    // 初始化结构体
+    person := Person{ "Alice", 25 }
+    address := Address{ city: "上海市", area: "普陀区" }
+    // 初始化带有匿名字段的结构体
+    std := Student{
+        Person: Person{ name: "Zhengyu", age: 24 },
+        speciality: "软件工程",
+        address: address,
+    }
+    fmt.Println(person, std)
+    // 访问值，注意访问匿名字段属性值
+    fmt.Println(std.Person.name, std.speciality, std.address.city)
+}
+```
+
+#### 结构体比较
+
+结构体是值类型，是可以比较的，如果它们对应的字段相等，则认为两个结构体变量相等。
+
+:::danger
+
+只有相同类型的结构体才能比较，**如果是两个不同的结构体，是不能比较的。**
+
+:::
+
+```go
+type name struct {  
+    firstName string
+    lastName string
+}
+func main() {  
+	name1 := name{"Steve", "Jobs"}
+	name2 := name{"Steve", "Jobs"}
+	fmt.Println(name1 == name2) // true
+	name2.lastName = "Zhengyu"
+	fmt.Println(name1 == name2) // false
 }
 ```
 
@@ -775,7 +836,7 @@ nil：空指针，指代零值。
 
 :::
 
-```Go
+```go
 func main() {
     a := 10
     var p *int = &a
@@ -787,7 +848,7 @@ func main() {
 
 对于二维数组，注意对不同层的指针：
 
-```Go
+```go
 func main() {
     arr := [2][3]int{
         {1,2,3},
@@ -810,7 +871,7 @@ func main() {
 
 #### 指向指针的指针
 
-```Go
+```go
 func main() {
     a := 3000
     var ptr *int = &a
@@ -825,7 +886,7 @@ func main() {
 
 定义的指针变量可以存储结构体变量的地址。
 
-```Go
+```go
 type Student struct {
     name    string
     age     int
@@ -842,4 +903,505 @@ func main() {
     fmt.Println(p.name, (*p).name)  // Alice Alice
 }
 ```
+
+## 四、函数
+
+### 函数定义、函数签名、函数值
+
+函数声明的定义：
+
+```go
+// 和func hypot(x float64, y float64) float64等价
+func hypot(x, y float64) float64 {
+    return math.Sqrt(x*x + y*y)
+}
+```
+
+判断两个函数的函数签名是否相同：形式参数列表和返回值列表中的变量类型一一对应。
+
+比如下面的两个函数，他俩的函数签名是相同的，但函数定义是不同的。
+
+```go
+func add(x int, y int) int { return x + y }
+func sub(x int, y int) int { return x - y }
+```
+
+在函数体中，**函数的形参作为局部变量**，被初始化为调用者提供的值。**函数的形参和有名返回值作为函数最外层的局部变量，被存储在相同的词法块中。**实参通过值的方式传递，因此函数的形参是实参的拷贝，对形参进行修改不会影响实参。但是，**如果实参包括引用类型，如指针，slice(切片)、map、function、channel等类型，实参可能会由于函数的间接引用被修改。**
+
+Go 语言支持多返回值：
+
+```go
+func calc(x int, y int) (int, int) { return x + y, x - y }
+// 裸返回值，z是有名返回值，也是定义的局部变量
+func calc2(x int, y int) (z int, err error) {
+    z = x + y
+    return
+}
+func main() {
+    fmt.Println(calc(2,4))  // 6 -2
+    fmt.Println(calc2(2,4))  // 6 <nil>
+}
+```
+
+在 Go 语言中，函数也是值，空值为 `nil` ，函数可以作为值传入到其他函数中。
+
+可变参数的使用和在 Javascript 中类似，主要有两处：
+
+- 函数形参：接收多个参数，得到的 vals 为切片类型
+- 函数传参：接收并展开切片类型为多个参数
+
+```go
+func sum(vals ...int) int {
+    total := 0
+    for _, val := range vals {
+        total += val
+    }
+    return total
+}
+
+func main() {
+    values := []int{1,2,3,4}
+    fmt.Println(sum(values...))
+}
+```
+
+### 匿名函数和闭包
+
+下面定义了一个匿名函数，将它作为值传入到 `strings.Map()` 函数中：
+
+```go
+strings.Map(func(r rune) rune { return r + 1 }, "HAL-9000")
+```
+
+闭包：
+
+`squares()` 返回后，变量 `x` 仍然隐式的存在于 f 中。
+
+```go
+// squares返回一个匿名函数
+// 该匿名函数每次被调用时都会返回下一个数的平方
+func squares() func() int {
+    var x int
+    return func() int {
+        x++
+        return x * x
+    }
+}
+func main() {
+    f := squares()
+    fmt.Println(f()) // "1"
+    fmt.Println(f()) // "4"
+    fmt.Println(f()) // "9"
+    fmt.Println(f()) // "16"
+}
+```
+
+函数，包括匿名函数，都是可以作为参数传给其他函数的，匿名函数可以赋值给变量：
+
+```go
+func main() {
+    // 定义匿名函数，并赋值给add
+    add := func(a int, b int) int {
+        return a + b
+    }
+    fmt.Println(add(3, 7))
+    // 定义能传入函数的匿名函数，并赋值给calculate
+    calculate := func(operation func(int, int) int, x int, y int) int {
+        return operation(x, y)
+    }
+    // 将函数作为其他函数参数
+    fmt.Println(calculate(add, 2, 3))
+    fmt.Println(calculate(func(a, b int) int { return a - b }, 10, 4))
+}
+```
+
+闭包陷阱，当在循环中使用闭包时候，注意变量引用问题：
+
+```go
+func main() {
+    var funcs []func()
+    for i := 0; i< 3; i++ {
+        i := i      // 由于闭包引用循环变量的问题，这行代码必须有，要创建新变量
+        funcs = append(funcs, func() {
+            fmt.Println(i)
+        })
+    }
+    for _, f := range funcs {
+        f()
+    }
+}
+```
+
+![闭包陷阱](./images/闭包陷阱.svg)
+
+### defer
+
+`defer` 是 Go 语言中的一个关键字，用于延迟执行一个函数，该函数会在所在函数执行完毕后才会被调用，无论函数是否发生错误。`defer` 常用于在函数执行完毕后，做一些清理工作，如关闭文件、释放资源等。`defer` 可以多次调用，它们将按照先进后出的顺序执行。
+
+```go
+func main() {
+    file, err := os.Open("test.txt")
+    if err != nil {
+        fmt.Println("Error opening file")
+        return
+    }
+    // defer被用来关闭文件
+    defer file.Close()
+}
+```
+
+### 错误和异常
+
+#### 错误处理基本认识
+
+在 Go 语言中，没有传统编程语言的 `try - catch` 操作，Go 语言中一切错误都需要显式处理，通常，我们**规定函数返回的最后一个数据是错误接口。**
+
+```go
+func age(v int)(int, error){
+    if v > 10 {
+        return 10, nil
+    }
+    return -1, errors.New("错误，年龄必须大于10岁")
+}
+```
+
+#### 错误处理策略
+
+1.传播错误
+
+函数中某个子程序的失败，会变成该函数的失败。
+
+比如上面的 `age()` 函数，如果出现错误，那么在调用它的函数中如果不处理就会报错。
+
+2.重新尝试失败的操作
+
+下面是发送 HEAD 请求检查服务器是否可用的函数，在 1 分钟内失败则重新请求，在 1 分钟外失败则报错返回。
+
+```go
+func WaitForServer(url string) error {
+    const timeout = 1 * time.Minute
+    // 设置超时时刻，为当前时间的1分钟后
+    deadline := time.Now().Add(timeout)
+    // 在超时时间前循环
+    for tries := 0; time.Now().Before(deadline); tries++ {
+        // 发送HEAD请求来检查服务器是否可用
+        _, err := http.Head(url)
+        // 如果错误返回空表示成功
+        if err == nil {
+            return nil
+        }
+        // 记录服务器未响应的错误信息
+        log.Printf("server not responding (%s); retrying…", err)
+        // 使用指数退避进行重试
+        time.Sleep(time.Second << uint(tries))
+    }
+    // 在超时时间内仍未得到服务器响应，返回错误信息
+    return fmt.Errorf("server %s failed to respond after %s", url, timeout)
+}
+```
+
+3.输出错误信息并结束程序
+
+这种策略只应在 main 中执行，对库函数而言，应传播错误。
+
+```go
+if err := WaitForServer(url); err != nil {
+    fmt.Fprintf(os.Stderr, "Site is down: %v\n", err)
+    os.Exit(1)
+}
+```
+
+4.只输出错误信息，不需要中断程序的运行
+
+```go
+if err := Ping(); err != nil {
+    log.Printf("ping failed: %v; networking disabled",err)
+}
+```
+
+#### panic 和 recover
+
+`panic` 作用：用于引发一个程序错误并停止当前函数的执行。当程序遇到无法处理的错误或异常情况时，可以调用panic函数来终止程序的执行，并且在 `panic` 时，会立即停止当前函数的执行，并且沿着函数调用栈一直向上传播，直到被recover捕获或者程序终止。
+
+`recover` 作用：从 `panic` 中恢复的函数，返回 `panic` 时的错误值。如果在 `defer` 语句中使用了 `recover` 函数，并且该 `defer` 语句是在发生 `panic` 之前的，则可以捕获到 `panic`，并进行处理。
+
+```go
+func doSomething() {
+    defer fmt.Println("Deferred from doSomething")
+    fmt.Println("Inside doSomething")
+    // 故意触发panic
+    panic("触发panic异常")
+}
+
+func main() {
+    defer func() {
+        if r := recover(); r != nil {
+            fmt.Println("从panic复原:", r)
+        }
+    }()
+    fmt.Println("Starting application")
+    doSomething()
+    fmt.Println("End of application")
+}
+
+/*
+Starting application
+Inside doSomething
+Deferred from doSomething
+从panic复原: 触发panic异常
+*/
+```
+
+## 五、方法
+
+### 方法的基本使用
+
+方法就是一个包含了接受者的函数，接受者可以是命名类型或者结构体类型的一个值或者是一个指针。
+
+```go
+type Oval struct {
+    a,
+    b float64
+}
+type Circle struct {
+    radius float64
+}
+// 可以定义相同的方法名
+func (oval Oval) getArea() float64 {
+    return math.Pi * oval.a * oval.b
+}
+func (circle Circle) getArea() float64 {
+    return math.Pi * math.Pow(circle.radius, 2)
+}
+func main() {
+    var oval Oval = Oval{ a: 10, b: 5 }
+    var circle Circle = Circle{ radius: 2 }
+    fmt.Println("椭圆面积 =", oval.getArea())
+    fmt.Println("圆面积 =", circle.getArea())
+}
+```
+
+当然，也可以传入结构体指针：
+
+两者的区别是传入结构体是原先结构体的副本，传入结构体指针是引用，如果方法内部修改了相关属性，引用的结构体属性也会对应修改。
+
+```go
+func (circle *Circle) getArea() float64 {
+    // 因为是引用类型，所以引用的外部结构体属性值也会变化
+    circle.radius = circle.radius * 10
+    return math.Pi * math.Pow(circle.radius, 2)
+}
+```
+
+既然有了函数，为何还要使用方法？
+
+1. Go 不是一种纯粹的面向对象的编程语言，它不支持类。因此，类型的方法是一种实现类似于类的行为方式。
+2. 相同名称的方法可以在不同的类型上定义，而具有相同名称的函数是不允许的。
+
+Go 语言中变量可以在三个地方声明：
+
+- 局部变量：函数内部，作用域只在函数体内，参数和返回值变量也是局部变量。
+- 全局变量：函数外部，首字母大写全局变量可以在整个包甚至外部包（被导出后）使用。
+- 形式参数：函数中定义，作为函数的局部变量来使用。
+
+### 方法继承和重写
+
+如果匿名字段实现了一个方法，那么包含这个匿名字段的结构体也能调用该方法。
+
+```go
+type Human struct {
+	name  string
+	age   int
+	phone string
+}
+type Employee struct {
+	Human   //匿名字段
+	company string
+}
+func (h *Human) SayHi() {
+	fmt.Printf("我是%s，你可以打电话 %s 联系我\n", h.name, h.phone)
+}
+func main() {
+	alice := Human{"Alice", 20, "1425698563"}
+	alice.SayHi()
+    // Employee包含Human匿名字段，也能调用该方法
+	zhengyu := Employee{Human{"Zhengyu", 24, "13813819438"}, "友塔游戏"}
+	zhengyu.SayHi()
+}
+```
+
+方法重写：
+
+```go
+func (h *Human) SayHi() {
+	fmt.Printf("我是%s，你可以打电话 %s 联系我\n", h.name, h.phone)
+}
+// Employee的方法重写Human的
+func (h *Employee) SayHi() {
+	fmt.Printf("我是雇员%s，电话%s\n", h.name, h.phone)
+}
+```
+
+### New()
+
+### 组合替代继承
+
+## 六、代码组织管理
+
+:::tip
+
+模块直接的关系通过 `go.mod` 关联，包之间的关系通过导入导出关联。
+
+:::
+
+### 模块
+
+Go 中的代码组织管理通过仓库、模块、包三个概念完成的：
+
+- 仓库：代码仓库
+- 模块：是库或程序的根节点，存放于仓库，可包含多个包
+- 包：同一目录下的源码文件，编译后会归到一起
+
+可以通过 `go mod init <module_path>`  来初始化模块，该命令会讲将当前模块初始化为 Go 模块，并生成 `go.mod` 文件。
+
+下面将创建两个模块，并让一个模块调用另外一个：
+
+1.创建 `main` 模块
+
+```bash
+mkdir main
+cd main
+go mod init github.com/zhengyu/main
+```
+
+2.创建 `grettings` 模块
+
+```bash
+mkdir main
+cd main
+go mod init github.com/zhengyu/grettings
+```
+
+`go.mod` 文件显示为：
+
+```mod
+module github.com/zhengyu/greetings
+
+go 1.21.3
+```
+
+3.在 `grettings` 模块下创建文件 `grettings.go` 并写入函数
+
+```go
+package greetings
+
+func Greetings(name string) string {
+	message := "你好，" + name
+	return message
+}
+```
+
+4.在 `main` 模块的 `main.go` 文件下引入 `Greetings` 函数
+
+```go
+package main
+
+import (
+	"fmt"
+	"github.com/zhengyu/greetings"
+)
+
+func main() {
+	mes := greetings.Greetings("筝语")
+	fmt.Println(mes)
+}
+```
+
+5.由于 `grettings` 模块是本地的，因此需要再执行
+
+```bash
+ go mod edit -replace github.com/zhengyu/greetings=../greetings
+```
+
+将提到的模块通过 `-replace` 指定到本地模块的位置。
+
+6.执行 `go mod tidy` 清理下依赖，即可正确按照依赖模块，这时候 `main` 模块下的 `go.mod` 文件更新为
+
+```mod
+module github.com/zhengyu/main
+
+go 1.21.3
+
+// 将本模块下引入的github.com/zhengyu/greetings路径都换成../greetings
+replace github.com/zhengyu/greetings => ../greetings
+
+require github.com/zhengyu/greetings v0.0.0-00010101000000-000000000000
+```
+
+### 包
+
+#### 包的基本操作
+
+Go 语言的结构是建立在包（package）基础之上的。
+
+`import` 关键字：导入其他的包，可以是本模块下的包，也可以是其他模块下的包。
+
+使用包的条件：
+
+1. **一个目录下的同级文件归属一个包，同一个包下面的所有文件的包名必须是一样的。**
+2. 包名为 `main` 的包为应用程序入口包，其他包不能使用。
+3. 包名可以与目录不同名，但建议同名。
+
+引用其他文件函数：
+
+- 同包下：不用导入，可直接使用
+- 同模块不同包：需要导入使用
+- 不同模块不同包：需要导入使用，同时 `go.mod` 文件需要替换到本地路径
+
+其他注意点：
+
+- **首字母大写被视作 `public` 公共资源，才能被导出。**
+- 包可以嵌套定义，对应的就是嵌套目录。
+
+```go
+import (
+	"fmt"
+	"github.com/zhengyu/greetings"
+	// 引用greetings模块下的utils包，名字重复了因此起了别名
+	greetingsUtils "github.com/zhengyu/greetings/utils"
+	// 引用本模块下的utils包
+	"github.com/zhengyu/main/utils"
+)
+```
+
+:::tip
+
+导入包时，会从 `GOROOT` 和 `GOPATH` 环境变量设置的目录中检索 `src/package` 来导入包，如果不存在则导入失败。
+
+GOROOT：Go 内置包的所在位置。
+
+GOPATH：自己定义的包的位置。
+
+:::
+
+内部包：可以创建项目内部使用的包，不必导出给外部使用，定义包名为 `internal` 即可。
+
+#### 管理外部包
+
+- [ ] 寻找最新的 `go.sum`、`go.work` 教程。
+- [ ] `go get` 已经废弃掉了， `go mod tidy` 、`go install` 等命令咋用呢？
+
+#### 版本管理
+
+当项目中多个模块依赖一个模块，但依赖的版本不同，比如：
+
+- A → D v1.0.0
+- B → D v1.1.0
+- C → D v1.2.0
+
+Go 的原则是选择 D 模块的最新 v1.2.0 版本，这就是最小引入原则。至于兼容性问题，需要包作者在后续新版本兼容旧版本。
+
+
+
+
 

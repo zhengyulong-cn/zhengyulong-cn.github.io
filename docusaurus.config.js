@@ -22,7 +22,7 @@ const config = {
       ({
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
-          showLastUpdateTime: true,
+          showLastUpdateTime: false,
         },
         blog: {},
         theme: {

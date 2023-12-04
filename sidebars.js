@@ -102,7 +102,8 @@ const sidebars = {
       label: 'Go语言从入门到精通',
       type: 'category',
       items: [
-        'backend-programing-skills/Go语言从入门到精通/Go语言基础'
+        'backend-programing-skills/Go语言从入门到精通/Go语言基础',
+        'backend-programing-skills/Go语言从入门到精通/Go语言常用API及转换',
       ]
     },
     {
