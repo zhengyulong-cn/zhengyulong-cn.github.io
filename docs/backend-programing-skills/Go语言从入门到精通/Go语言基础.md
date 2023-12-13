@@ -3,7 +3,7 @@
 > 未完成：
 > - [ ] 方法部分，差New()、组合
 > - [ ] 代码组织管理部分，未全
-> - [ ] 接口
+> - [x] 接口
 > - [ ] 反射
 > - [ ] 泛型
 > - [ ] 文件操作
@@ -1400,6 +1400,153 @@ GOPATH：自己定义的包的位置。
 - C → D v1.2.0
 
 Go 的原则是选择 D 模块的最新 v1.2.0 版本，这就是最小引入原则。至于兼容性问题，需要包作者在后续新版本兼容旧版本。
+
+## 七、接口
+
+### 接口的基本使用
+
+接口类型：一种抽象的类型，作用是定义协议，不关系是什么类型，只关系能做什么。
+
+实现接口的条件：
+
+```go
+// 定义Shape接口
+type Shape interface {
+	area() float64
+}
+// 定义结构体
+type Rectangle struct {
+	width  float64
+	height float64
+}
+type Circle struct {
+	radius float64
+}
+// 定义Rectangle的方法
+func (r Rectangle) area() float64 {
+	return r.width * r.height / 2
+}
+func (r Rectangle) circumference() float64 {
+	return r.width + r.height + math.Sqrt(math.Pow(r.width, 2)+math.Pow(r.height, 2))
+}
+// 定义Circle的方法
+func (c Circle) area() float64 {
+	return math.Pi * math.Pow(c.radius, 2)
+}
+func main() {
+    // 变量s是接口类型变量
+	var s Shape = Rectangle{width: 10, height: 5}
+	fmt.Println(s.area())
+	var s2 = Rectangle{width: 10, height: 5}
+	fmt.Println(s2.area(), s2.circumference())
+	var s3 Shape = Circle{radius: 2}
+	fmt.Println(s3.area())
+}
+```
+
+一个类型可以实现多个接口，一个接口也能由多个类型实现。
+
+### 值接收者和指针接收者
+
+值接收者：
+
+- 将方法附加到值的副本上，方法内对接收者的修改不会影响原始值。
+- 在方法调用时候自动将值的副本传递给方法。
+
+指针接收者：
+
+- 将方法附加到值的地址上，方法内对接收者的修改会影响原始值。
+- 在方法调用时候自动将值的地址传递给方法。
+
+:::tip
+
+使用值接收者，下面代码中 `s = cir` 和 `s = &cir` 都是可行的，这是因为 Go 语言在赋值时进行了自动转换，当使用 `s = cir` 时，会自动获得 `cir` 的地址并将其存储在 `s` 中。而使用 `s = &cir` 则是显式的提供了 `cir` 的地址，这是允许的。
+
+:::
+
+```go
+func (c *Circle) area() float64 {
+	return math.Pi * math.Pow(c.radius, 2)
+}
+func main() {
+    var s Shape
+	var cir = Circle{radius: 2}
+	s = &cir
+    // 	s = cir		// 报错
+	fmt.Println(s.area())
+}
+```
+
+### 接口嵌套
+
+接口与接口之间是可以嵌套后创造出新接口的。
+
+```go
+type Animal interface {
+    Sayer
+    Mover
+}
+```
+
+通过接口嵌套，将各个接口组合起来了。
+
+### 空接口
+
+在没有定义任何方法的接口，因此任何类型都实现了空接口，**空接口类型的变量可以存储任意类型的变量**。
+
+```go
+func main() {
+    // 空接口作为map的值，这样value可以是任意类型了
+	studentInfo := make(map[string]interface{})
+	studentInfo["name"] = "筝语"
+	studentInfo["age"] = 18
+	studentInfo["married"] = false
+	fmt.Println(studentInfo)
+}
+```
+
+### 类型断言
+
+**一个接口的值是由一个具体类型和具体类型的值两部分组成的，分别称为接口的动态类型和动态值。**
+
+```go
+var w io.Writer = os.Stdout
+```
+
+![image-20231207233124756](./images/image-20231207233124756.png)
+
+想要判断接口中的值时候就可以使用类型断言：
+
+```go
+func main() {
+    var i interface{} = 42
+    val, ok := i.(int)
+    if ok {
+        fmt.Println("i是一个整数:", val)
+    } else {
+        fmt.Println("i不是一个整数")
+    }
+}
+```
+
+类型断言和 `switch` 语句：
+
+```go
+func justifyType(x interface{}) {
+	switch val := x.(type) {
+	case string:
+		fmt.Println("x is a string", val)
+	case int:
+		fmt.Println("x is a int", val)
+	case bool:
+		fmt.Println("x is a bool", val)
+	default:
+		fmt.Println("Unsupport type")
+	}
+}
+```
+
+
 
 
 
