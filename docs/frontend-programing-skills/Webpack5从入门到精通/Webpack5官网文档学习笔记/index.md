@@ -85,14 +85,14 @@ npm install --save-dev style-loader css-loader
 
 2.修改`webpack.config.js`文件
 
-::: tip
+:::tip
 
 - loader可以链式调用，第一个loader将其结果传递给下一个loader，以此类推。
 - webpack根据正则表达式来确定查找哪些文件，并指定给相关loader。比如`/\.css$/i`就匹配`.css`文件的后缀
 
 :::
 
-```js{8-18}
+```js
 const path = require('path')
 module.exports = {
   entry: "./src/index.js",
@@ -122,7 +122,7 @@ module.exports = {
 }
 ```
 
-```js{2,6}
+```js
 import _ from 'lodash';
 import './style.css';
 function component() {
@@ -144,7 +144,7 @@ document.body.appendChild(component())
 
 这样图像就会被处理并添加到output目录
 
-```js{10-14}
+```js
 module.exports = {
   ...
   module: {
@@ -168,7 +168,7 @@ module.exports = {
 
 在JS中引入：
 
-```js{3,9-11}
+```js
 import _ from 'lodash';
 import './style.css';
 import RefImage from './toRef和toRefs.svg';
@@ -284,7 +284,7 @@ document.body.appendChild(component())
 
 多个入口就会生成多个出口，因此output部分也要做出相关修改。
 
-```js{3-6,8}
+```js
 const path = require('path');
 module.exports = {
   entry: {
@@ -312,7 +312,7 @@ npm install --save-dev html-webpack-plugin
 
 5.更新`webpack.config.js`文件
 
-```js{2,8-12}
+```js
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
@@ -364,7 +364,7 @@ module.exports = {
 
 在`webpack.config.js`中添加devtool选项就能配置source map。
 
-```js{4,9-11}
+```js
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
@@ -397,17 +397,15 @@ module.exports = {
 
 ```json{4}
 {
-  ...
   "scripts": {
   	"build": "webpack",
     "watch": "webpack --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  ...
 }
 ```
 
-::: tip
+:::tip
 `webpack --watch`唯一的缺点是，为了看到修改后的实际效果，你需要刷新浏览器。
 :::
 
@@ -423,7 +421,7 @@ npm install --save-dev webpack-dev-server
 
 以下配置告知`webpack-dev-server`，将`dist`目录下的文件serve到`localhost:8080`下。
 
-::: danger
+:::danger
 注意这里配置了`optimization.runtimeChunk: 'single'`选项，是因为这里是单个HTML页面多个入口，没配置的话，可能会遇到一些问题，具体见代码分割章节。配置该项后会生成`runtime.bundle.js`文件。
 
 将`optimization.runtimeChunk`设置值时，会为入口添加含有runtime的额外chunk。此配置的值可以有：
@@ -433,11 +431,13 @@ npm install --save-dev webpack-dev-server
 
 :::
 
-::: tip
+:::tip
+
 `webpack-dev-server`会从`output.path`中定义的目录中的bundle文件提供服务，即从`http://[devServer.host]:[devServer.port]/[output.publicPath]/[output.filename]`进行访问。
+
 :::
 
-```js{10-12,23-25}
+```js
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
@@ -505,7 +505,7 @@ module.exports = {
 
 1.修改`webpack.config.js`文件
 
-```js{5-15,26,30-32}
+```js
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
@@ -553,7 +553,7 @@ module.exports = {
 
 使用`optimization.splitChunks`配置项后，可以看出index和another的bundle已经移出重复依赖模块了，而重复的lodash分离到单独的chunk中。
 
-```js{5-8,23-27}
+```js
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
@@ -584,7 +584,7 @@ module.exports = {
 }
 ```
 
-::: tip
+:::tip
 
 除了`SplitChunksPlugin`，社区还提供一些其他的plugin用于分离CSS：
 
@@ -621,7 +621,7 @@ getComponent2().then((component) => {
 })
 ```
 
-::: warning
+:::warning
 
 动态导入这里还是有疑问的，在打包过程中如果一处用到，那还不是相对于全局打包？这种打包其实并没有根据某个页面而更换。
 
@@ -668,7 +668,7 @@ const lazyComp = () =>
   });
 ```
 
-::: danger
+:::danger
 
 在某些极端情况，如果在 webpack 开始加载该脚本之前脚本加载失败，则该catch程序就不会执行，webpack不知道是哪个脚本失败了。
 
@@ -687,7 +687,7 @@ const lazyComp = () =>
 
 ## 缓存❓
 
-::: warning
+:::warning
 
 该节有些没看懂，以后再翻看吧。
 
@@ -701,7 +701,7 @@ const lazyComp = () =>
 
 我们可以通过替换`output.filename`中的可替换模板字符串设置来定义输出文件名称，其中`[contenthash]`将根据资源内容创建出唯一hash，资源变化时`[contenthash]`也会变化。
 
-```js{4}
+```js
 module.exports = {
   ...
   output: {
@@ -718,7 +718,7 @@ module.exports = {
 
 在项目中动态引入lodash和dayjs，查看打包情况：
 
-```js{18-29}
+```js
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
@@ -922,7 +922,7 @@ module.exports = merge(common, {
 
 许多 library 通过与 `process.env.NODE_ENV` 环境变量关联，以决定 library 中应该引用哪些内容。
 
-::: danger
+:::danger
 
 注意： `process.env.NODE_ENV` 是不能用在webpack配置文件中的，比如`process.env.NODE_ENV === 'production' ? '[name].[contenthash].bundle.js' : '[name].bundle.js'` 这样的条件语句，是无法按照预期运行的。
 
@@ -936,7 +936,7 @@ if(process.env.NODE_ENV !== 'production') {
 
 ## 懒加载
 
-```js{10-14}
+```js
 import _ from 'lodash';
 function component() {
   const element = document.createElement('div');
