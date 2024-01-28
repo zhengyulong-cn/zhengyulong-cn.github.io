@@ -99,6 +99,13 @@ const sidebars = {
   'backend-programing-skills': [
     'backend-programing-skills/index',
     {
+      label: 'Python从入门到精通',
+      type: 'category',
+      items: [
+        'backend-programing-skills/Python从入门到精通/Python语言快速入门',
+      ]
+    },
+    {
       label: 'Go语言从入门到精通',
       type: 'category',
       items: [
