@@ -37,8 +37,10 @@ bootstrap();
 
 控制器（Controller）负责**处理传入的请求和向客户端返回响应**。
 
-::: tip
+:::tip
+
 要使用CLI创建控制器，只需执行`nest g controller cats`命令。
+
 :::
 
 给定例子，之后的分析将围绕着这个例子：
@@ -78,8 +80,10 @@ export class AppController {
 
 路由路径由`@Controller()`和`@Get()`组合而成。例子中得到的路径就是`/api/hello`，而且**路由是支持模式匹配**的。
 
-::: tip
+:::tip
+
 常用路由匹配符号：
+
 | 匹配符号 | 作用 | 例子 |
 | --- | --- | --- |
 | `*` | 匹配任意字符 | `/ab*cd`匹配`/abcd`、`/abecd` |
@@ -89,6 +93,7 @@ export class AppController {
 | `{}` | 允许在路径中使用多个参数名 | `/post/{year}/{month}/{day}`匹配`/post/2010/10/10`，并将year设置为2020，month设置为10，day设置为10 |
 | `()` | 用于创建组 | `/(foo\|bar)`匹配`/foo`或`/bar` |
 | `[]` | 允许匹配特定的字符集 | `/[abc]`匹配`/a`、`/b`、`/c` |
+
 :::
 
 ### 响应
@@ -99,8 +104,10 @@ export class AppController {
 - 类库特有响应
   - 在签名出通过`@Res()`注入类库特定对象（例如Express），这样就能使用该响应对象暴露的原生响应处理函数。比如使用Express就能使用`response.status(200).send()`构建响应。
 
-::: danger
+:::danger
+
 注意：在一个处理函数上如果同时使用了这两种方法，那么此处就会自动禁止此路由。如果需要在某个处理函数上同时使用这两种方法，必须在装饰器`@Res({ passthrough: true }) 中将 passthrough`选项设为true。
+
 :::
 
 ### 请求
@@ -205,8 +212,10 @@ export class AppModule {}
 
 许多级别的Nest类可能被视为Provider，如Service、Repository、Factory、Helper等等，它们都可以通过constructor**注入**依赖关系。Provider只是一个用`@Injectable()`装饰的类。
 
-::: tip
+:::tip
+
 要使用CLI创建控制器，只需执行`nest g service cats`命令。
+
 :::
 
 ### 依赖注入
@@ -295,8 +304,10 @@ export class CatsModule {
 }
 ```
 
-::: danger
+:::danger
+
 由于循环依赖性，Module不能注入到Provider中！
+
 :::
 
 ### 全局模块
@@ -367,8 +378,10 @@ export class AppModule implements NestModule {
 }
 ```
 
-::: warning
+:::warning
+
 `apply()`方法可以使用单个中间件，也可以使用多个参数来指定**多个中间件**。
+
 :::
 
 ### 函数中间件
@@ -479,8 +492,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
 }
 ```
 
-::: danger
+:::danger
+
 所有的异常过滤器都应实现通用的`ExceptionFilter<T>`接口，它需要实现`catch(exception: T, host: ArgumentsHost)`方法，`T`表示异常类型。
+
 :::
 
 `ArgumentsHost`是一个功能强大的实用程序对象，将在应用上下文章节中进一步研究。
@@ -507,8 +522,10 @@ async create(@Body() createCatDto: CreateCatDto) {
 export class CatsController { }
 ```
 
-::: warning
+:::warning
+
 尽可能使用类而不是实例。由于Nest.js可以轻松地在整个模块中重复使用同一类的实例，因此可以**减少内存使用**。
+
 :::
 
 3.全局范围
@@ -519,8 +536,10 @@ app.useGlobalFilters(new HttpExceptionFilter());
 await app.listen(3000);
 ```
 
-::: danger
+:::danger
+
 全局范围使用的`useGlobalFilters()`方法不会为网关和混合应用程序设置过滤器。
+
 :::
 
 全局过滤器用于整个应用程序、每个控制器和每个路由处理程序。就依赖注入而言，从任何模块外部注册的全局过滤器（使用上面示例中的`useGlobalFilters()`）不能注入依赖，因为它们不属于任何模块。为了解决这个问题，你可以注册一个全局范围的过滤器直接为任何模块设置过滤器：
@@ -578,8 +597,10 @@ async findOne(@Param('id', ParseIntPipe) id: number) {
 
 确保在`findOne()`方法中接收的参数是一个数字，或在路由处理程序被调用前抛出异常。
 
-::: tip
+:::tip
+
 推荐传递类而不是实例，如果想通过传递选项来自定义管道行为，可以传递实例。
+
 :::
 
 ### 自定义管道
@@ -626,8 +647,10 @@ export class JoiValidationPipe implements PipeTransform {
 }
 ```
 
-::: tip
+:::tip
+
 验证管道，要么返回值不变，要么抛出异常！
+
 :::
 
 使用JoiValidationPipe，通过`@UsePipes()`装饰器绑定到方法上：
@@ -701,8 +724,10 @@ export class ValidationPipe implements PipeTransform {
 }
 ```
 
-::: danger
+:::danger
+
 `plainToInstance()`方法将普通JavaScript参数对象转换为可验证的类型对象。必须这样做的原因是**传入的Post body对象从网络请求反序列化时不携带任何类型信息**。`Class-validator`需要使用我们之前为DTO定义的验证装饰器，因此我们需要执行此转换，将传入的主体转换为有装饰器的对象，而不仅仅是普通的对象。
+
 :::
 
 最后绑定到方法上：
@@ -894,8 +919,10 @@ export class LoggingInterceptor implements NestInterceptor {
 }
 ```
 
-::: danger
+:::danger
+
 `NestInterceptor<T，R>`是一个通用接口，其中`T`表示已处理的`Observable<T>`的类型（在流后面），而`R`表示包含在返回的`Observable<R>`中的值的返回类型。
+
 :::
 
 `next.handle()`返回一个RxJS的`Observable`，因此有多种操作符来操作数据流，上面例子中使用了`tag()`运算符，该运算符可观察序列的正常或异常终止时调用函数。

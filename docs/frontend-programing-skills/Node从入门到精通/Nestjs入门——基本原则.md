@@ -45,7 +45,7 @@ export class AppModule {}
 
 当IOC容器实例化CatsController时，会首先查找所有依赖项，当查找到CatsService依赖项时，会对其令牌执行查找并返回CatsService类。如果是默认的单例范围，Nest.js将创建CatsService实例，将其缓存并返回，或返回现有的缓存实例。
 
-::: tip
+:::tip
 `providers: [CatsService]`是如下代码的简写：
 
 ```ts
@@ -84,7 +84,7 @@ const mockCatsService = {
 export class AppModule {}
 ```
 
-::: danger
+:::danger
 注意：`useValue`与要替换的CatsService类要具有相同的接口
 :::
 
@@ -116,7 +116,7 @@ export class CatsRepository {
 }
 ```
 
-::: tip
+:::tip
 为了代码组织清晰，最佳实践应该是将令牌放在单独文件中定义。
 :::
 
@@ -254,7 +254,7 @@ const asyncConnectionFactory ={
 export class AppModule {}
 ```
 
-::: tip
+:::tip
 动态模块本身可以导入其他模块，如果动态模块依赖于其他模块的Provider，则可以使用`imports`属性导入它们。
 :::
 
@@ -335,7 +335,7 @@ import { Injectable, Scope } from '@nestjs/common';
 export class CatsService {}
 ```
 
-::: danger
+:::danger
 注意：必须非常谨慎使用范围限制，`scope`其实是在注入链中冒泡的。比如注入链：`CatsController <- CatsService <- CatsRepository`，如果CatsService是请求范围的，那么CatsController也会成为请求范围，而CatsRepository依然是单例的。
 
 这种情况下，循环依赖关系会导致非常痛苦的副作用，必须要尽可能的避免创建它们。
@@ -423,7 +423,7 @@ export class ConfigService implements OnModuleInit {
 }
 ```
 
-::: tip
+:::tip
 要从全局上下文获取一个Provider，向`get()`的第二个参数传递`{ strict: false }`选项。
 :::
 
@@ -496,7 +496,7 @@ export class CatsService implements OnModuleInit {
 
 默认情况下，模块是预加载的，这意味着一旦应用程序加载，所有模块也会加载，无论它们是否立即需要。虽然对绝大多数应用程序来说很好，但它可能在serverless中运行的apps和workers是个瓶颈，懒加载能通过加载特定需要的模块来减少引导时间。
 
-::: warning
+:::warning
 注意：懒加载的模块和服务不会调用生命周期钩子方法。
 :::
 
@@ -519,7 +519,7 @@ export class LazyService {
 const lazyModuleLoader = app.get(LazyModuleLoader);
 ```
 
-::: danger
+:::danger
 由于Nest.js中的Controller表示路由/路径/查询的集合，因此不能使用LazyModuleLoader类延迟加载它们。
 :::
 
@@ -682,7 +682,7 @@ const roles = this.reflector.getAllAndMerge<string[]>('roles', [
 | `beforeApplicationShutdown()` | 在所有`onModuleDestory()`完成后调用；一旦完成，所有存在连接将会关闭 |
 | `OnApplicationShutdown()` | 连接关闭处理时调用 |
 
-::: danger
+:::danger
 上述列出的生命周期钩子没有被请求范围类触发。请求范围类并没有和生命周期以及不可预测的寿命绑定。他们为每个请求单独创建，并在响应发送后通过垃圾清理系统自动清理。
 :::
 
@@ -707,6 +707,6 @@ async function bootstrap() {
 }
 ```
 
-::: warning
+:::warning
 `enableShutdownHooks`开始监听时消耗内存，如果要在一个单独Node线程中运行多个Nest应用（例如，使用多个Jest运行测试），Node会抱怨监听者太多。出于这个原因`enableShutdownHooks`默认未启用，要在单个Node进程中运行多个实例时尤其要注意这一点。
 :::
