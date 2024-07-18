@@ -103,6 +103,7 @@ const sidebars = {
       type: 'category',
       items: [
         'backend-programing-skills/Python从入门到精通/Python语言快速入门',
+        'backend-programing-skills/Python从入门到精通/Python语言常用API及转换',
       ]
     },
     {
